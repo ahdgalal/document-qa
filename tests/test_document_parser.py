@@ -4,7 +4,8 @@ import pytest
 from fpdf import FPDF
 
 from document_qa.document_parser import (
-    PDFHasNoTextError,
+    DocumentDecodingError,
+    DocumentHasNoTextError,
     PDFParsingError,
     UnsupportedFileTypeError,
     clean_text,
@@ -89,5 +90,24 @@ def test_blank_pdf_raises_no_text_error(tmp_path: Path):
     pdf.add_page()  # creates a valid PDF page w/o text
     pdf.output(str(path))
 
-    with pytest.raises(PDFHasNoTextError, match="almost no extractable text"):
+    with pytest.raises(DocumentHasNoTextError, match="almost no extractable text"):
         parse_document(path)
+
+
+def test_non_utf8_txt_raises_decoding_error(tmp_path: Path):
+    path = tmp_path / "latin1.txt"
+    path.write_bytes("café".encode("latin-1"))
+    with pytest.raises(DocumentDecodingError):
+        parse_document(path)
+
+
+def test_empty_txt_raises_no_text_error(tmp_path: Path):
+    path = tmp_path / "empty.txt"
+    path.write_text("", encoding="utf-8")
+    with pytest.raises(DocumentHasNoTextError):
+        parse_document(path)
+
+
+def test_missing_file_raises_not_found(tmp_path: Path):
+    with pytest.raises(FileNotFoundError):
+        parse_document(tmp_path / "missing.pdf")
