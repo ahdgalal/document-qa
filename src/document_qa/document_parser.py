@@ -4,6 +4,8 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
+MIN_EXTRACTABLE_CHARACTERS = 50
+
 
 class UnsupportedFileTypeError(ValueError):
     pass
@@ -13,7 +15,11 @@ class PDFParsingError(ValueError):
     pass
 
 
-class PDFHasNoTextError(ValueError):
+class DocumentDecodingError(ValueError):
+    pass
+
+
+class DocumentHasNoTextError(ValueError):
     pass
 
 
@@ -39,9 +45,22 @@ def parse_document(file_path: str | Path) -> list[dict[str, int | str]]:
     path = Path(file_path)
     suffix = path.suffix.lower()
 
+    if not path.is_file():
+        raise FileNotFoundError(f"File not found: '{path.name}'")
+
     if suffix in {".txt", ".md"}:
-        text = path.read_text(encoding="utf-8")
-        return [{"page_number": 1, "text": clean_text(text)}]
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as e:
+            raise DocumentDecodingError(
+                f"'{path.name}' is not valid UTF-8 text."
+            ) from e
+
+        text = clean_text(text)
+        if not text:
+            raise DocumentHasNoTextError(f"'{path.name}' is empty.")
+
+        return [{"page_number": 1, "text": text}]
 
     if suffix != ".pdf":
         raise UnsupportedFileTypeError(
@@ -54,24 +73,17 @@ def parse_document(file_path: str | Path) -> list[dict[str, int | str]]:
 
         for page_number, page in enumerate(reader.pages, start=1):
             text = clean_text(page.extract_text() or "")
-            pages.append(
-                {
-                    "page_number": page_number,
-                    "text": text,
-                }
-            )
+            pages.append({"page_number": page_number, "text": text})
 
     except Exception as e:
         # raises error while preserving the original exception for debugging
         raise PDFParsingError(f"Could not read PDF '{path.name}': {e}") from e
 
-    # check doc as a whole not each page
+    # check doc as a whole, not each page; a very short legitimate PDF could trip this
     total_text = "".join(page["text"] for page in pages)
 
-    if (
-        len(total_text.strip()) < 50
-    ):  # short legitimate PDF could trigger this threshold
-        raise PDFHasNoTextError(
+    if len(total_text.strip()) < MIN_EXTRACTABLE_CHARACTERS:
+        raise DocumentHasNoTextError(
             f"PDF '{path.name}' contains almost no extractable text. "
             "It may be scanned or empty."
         )
