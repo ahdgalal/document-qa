@@ -15,7 +15,7 @@ All documents are official NIST publications.
    https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-4.pdf
 
 5. **Secure Software Development Practices for Generative AI and Dual-Use Foundation Models: An SSDF Community Profile** — Secure development practices for generative AI systems.  
-   https://csrc.nist.gov/pubs/sp/800/218/a/final
+   https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.29.pdf
 
 6. **NIST Privacy Framework: An Overview** — Privacy risk management and protecting personal information.  
    https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=930470
