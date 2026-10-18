@@ -1,7 +1,16 @@
 from pathlib import Path
+
 import pytest
-from document_qa.document_parser import parse_document, clean_text, PDFParsingError, UnsupportedFileTypeError, PDFHasNoTextError
 from fpdf import FPDF
+
+from document_qa.document_parser import (
+    PDFHasNoTextError,
+    PDFParsingError,
+    UnsupportedFileTypeError,
+    clean_text,
+    parse_document,
+)
+
 
 def test_txt_is_one_page(tmp_path: Path):
     file_path = tmp_path / "policy.txt"
@@ -45,11 +54,13 @@ def create_test_pdf(path):
 
     pdf.output(str(path))
 
+
 def test_clean_text():
     text = "The ﬁrst inter-\nnational example"
     cleaned = clean_text(text)
 
     assert "The first international example" == cleaned
+
 
 def test_garbage_pdf_raises_error(tmp_path):
     path = tmp_path / "broken.pdf"
@@ -75,7 +86,7 @@ def test_blank_pdf_raises_no_text_error(tmp_path: Path):
     path = tmp_path / "blank.pdf"
 
     pdf = FPDF()
-    pdf.add_page() # creates a valid PDF page w/o text
+    pdf.add_page()  # creates a valid PDF page w/o text
     pdf.output(str(path))
 
     with pytest.raises(PDFHasNoTextError, match="almost no extractable text"):

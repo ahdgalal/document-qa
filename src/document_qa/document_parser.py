@@ -1,18 +1,20 @@
-from pathlib import Path
-from pypdf import PdfReader
 import re
 import unicodedata
+from pathlib import Path
+
+from pypdf import PdfReader
 
 
 class UnsupportedFileTypeError(ValueError):
     pass
 
+
 class PDFParsingError(ValueError):
     pass
 
+
 class PDFHasNoTextError(ValueError):
     pass
-
 
 
 def clean_text(text: str) -> str:
@@ -42,7 +44,9 @@ def parse_document(file_path: str | Path) -> list[dict[str, int | str]]:
         return [{"page_number": 1, "text": clean_text(text)}]
 
     if suffix != ".pdf":
-        raise UnsupportedFileTypeError(f"Unsupported file type: {suffix or '(no extension)'}")
+        raise UnsupportedFileTypeError(
+            f"Unsupported file type: {suffix or '(no extension)'}"
+        )
 
     try:
         reader = PdfReader(path)
@@ -50,25 +54,26 @@ def parse_document(file_path: str | Path) -> list[dict[str, int | str]]:
 
         for page_number, page in enumerate(reader.pages, start=1):
             text = clean_text(page.extract_text() or "")
-            pages.append({
-                "page_number": page_number,
-                "text": text,
-            })
+            pages.append(
+                {
+                    "page_number": page_number,
+                    "text": text,
+                }
+            )
 
     except Exception as e:
         # raises error while preserving the original exception for debugging
-        raise PDFParsingError(
-            f"Could not read PDF '{path.name}': {e}"
-        ) from e
+        raise PDFParsingError(f"Could not read PDF '{path.name}': {e}") from e
 
     # check doc as a whole not each page
     total_text = "".join(page["text"] for page in pages)
 
-    if len(total_text.strip()) < 50: # short legitimate PDF could trigger this threshold
+    if (
+        len(total_text.strip()) < 50
+    ):  # short legitimate PDF could trigger this threshold
         raise PDFHasNoTextError(
             f"PDF '{path.name}' contains almost no extractable text. "
             "It may be scanned or empty."
         )
 
     return pages
-    
