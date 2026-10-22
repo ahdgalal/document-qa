@@ -5,7 +5,11 @@ import numpy as np
 from fastembed import TextEmbedding
 
 from document_qa.chunker import chunk_pages
-from document_qa.document_parser import parse_document
+from document_qa.document_parser import (
+    DocumentHasNoTextError,
+    PDFParsingError,
+    parse_document,
+)
 from document_qa.settings import Settings
 
 
@@ -33,9 +37,11 @@ def collect_chunks(data_dir: Path) -> list[dict]:
     for pdf_path in find_pdfs(data_dir):
         try:
             chunks = index_document(pdf_path)
-            all_chunks.extend(chunks)
-        except Exception as exc:
+        except (PDFParsingError, DocumentHasNoTextError) as exc:
             print(f"{pdf_path.name}: skipped: {exc}")
+            continue
+
+        all_chunks.extend(chunks)
 
     return all_chunks
 
