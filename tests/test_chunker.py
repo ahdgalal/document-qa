@@ -1,3 +1,5 @@
+from itertools import pairwise
+
 from document_qa.chunker import chunk_pages
 
 
@@ -68,5 +70,5 @@ def test_chunks_overlap():
 
     assert len(chunks) > 1
 
-    for previous, current in zip(chunks, chunks[1:]):
+    for previous, current in pairwise(chunks):
         assert previous["text"][-3:] == current["text"][:3]
