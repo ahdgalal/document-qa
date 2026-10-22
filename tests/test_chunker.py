@@ -2,9 +2,7 @@ from document_qa.chunker import chunk_pages
 
 
 def test_no_chunk_exceeds_size_limit():
-    pages = [
-        {"page_number": 1, "text": "Python is easy to learn and use"}
-    ]
+    pages = [{"page_number": 1, "text": "Python is easy to learn and use"}]
 
     chunks = chunk_pages(
         pages,
@@ -27,14 +25,20 @@ def test_chunks_never_cross_pages():
         chunk_size=10,
     )
 
-    assert all(chunk["page_number"] == 1 for chunk in chunks if chunk["text"].startswith("First"))
-    assert all(chunk["page_number"] == 2 for chunk in chunks if chunk["text"].startswith("Second"))
+    assert all(
+        chunk["page_number"] == 1
+        for chunk in chunks
+        if chunk["text"].startswith("First")
+    )
+    assert all(
+        chunk["page_number"] == 2
+        for chunk in chunks
+        if chunk["text"].startswith("Second")
+    )
 
 
 def test_chunks_contain_required_metadata():
-    pages = [
-        {"page_number": 1, "text": "Hello world"}
-    ]
+    pages = [{"page_number": 1, "text": "Hello world"}]
 
     chunks = chunk_pages(
         pages,

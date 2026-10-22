@@ -1,12 +1,9 @@
 import json
 
 import numpy as np
-
-from document_qa.search import load_index
 import pytest
 
-from document_qa.search import Index
-
+from document_qa.search import Index, load_index
 
 
 class FakeModel:
@@ -50,6 +47,7 @@ def test_search_returns_top_chunks(tmp_path):
     assert results[0]["score"] == 1.0
     assert results[1]["text"] == "About birds"
     assert results[1]["score"] == np.float32(0.8).item()
+
 
 def test_search_rejects_invalid_top_k():
     index = Index(

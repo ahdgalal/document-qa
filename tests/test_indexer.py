@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-from document_qa.indexer import find_pdfs, collect_chunks, save_index
+from document_qa.indexer import collect_chunks, find_pdfs, save_index
 
 
 def test_find_pdfs_returns_only_pdf_files(tmp_path):
@@ -56,7 +56,6 @@ def test_save_index_writes_jsonl_and_numpy(tmp_path):
     np.testing.assert_array_equal(saved_embeddings, embeddings)
 
 
-
 def test_collect_chunks_skips_failed_document(tmp_path, monkeypatch, capsys):
     for name in ["bad.pdf", "good.pdf"]:
         (tmp_path / name).touch()
@@ -76,4 +75,3 @@ def test_collect_chunks_skips_failed_document(tmp_path, monkeypatch, capsys):
     assert len(result) == 1
     assert result[0]["document_name"] == "good.pdf"
     assert "bad.pdf: skipped: No text found" in capsys.readouterr().out
-

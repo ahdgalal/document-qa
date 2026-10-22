@@ -1,13 +1,10 @@
-import re
-
-
 def chunk_pages(
     pages: list[dict],
     document_name: str,
     chunk_size: int = 1200,
     overlap: int = 150,
 ) -> list[dict]:
-    
+
     if chunk_size < 1:
         raise ValueError("chunk_size must be positive")
 
@@ -34,12 +31,14 @@ def chunk_pages(
             chunk = text[start:end].strip()
 
             if chunk:
-                chunks.append({
-                    "document_name": document_name,
-                    "page_number": page["page_number"],
-                    "chunk_index": len(chunks),
-                    "text": chunk,
-                })
+                chunks.append(
+                    {
+                        "document_name": document_name,
+                        "page_number": page["page_number"],
+                        "chunk_index": len(chunks),
+                        "text": chunk,
+                    }
+                )
 
             if end >= len(text):
                 break

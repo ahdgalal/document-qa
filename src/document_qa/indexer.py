@@ -1,10 +1,13 @@
-from pathlib import Path
-from document_qa.document_parser import parse_document
-from document_qa.chunker import chunk_pages
-from document_qa.settings import Settings
 import json
+from pathlib import Path
+
 import numpy as np
 from fastembed import TextEmbedding
+
+from document_qa.chunker import chunk_pages
+from document_qa.document_parser import parse_document
+from document_qa.settings import Settings
+
 
 def find_pdfs(data_dir: Path) -> list[Path]:
     # makes the order predictable across runs
@@ -24,7 +27,6 @@ def index_document(pdf_path: Path) -> list[dict]:
     return chunks
 
 
-
 def collect_chunks(data_dir: Path) -> list[dict]:
     all_chunks = []
 
@@ -38,23 +40,23 @@ def collect_chunks(data_dir: Path) -> list[dict]:
     return all_chunks
 
 
-
 def embed_chunks(chunks: list[dict]) -> np.ndarray:
     if not chunks:
         return np.empty((0, 384), dtype=np.float32)
-    
+
     model = TextEmbedding("BAAI/bge-small-en-v1.5")
     texts = [chunk["text"] for chunk in chunks]
     embeddings = list(model.embed(texts, batch_size=8))
 
     return np.array(embeddings, dtype=np.float32)
 
+
 def save_index(
     chunks: list[dict],
     embeddings: np.ndarray,
     data_dir: Path,
 ) -> None:
-    
+
     chunks_path = data_dir / "chunks.jsonl"
     embeddings_path = data_dir / "embeddings.npy"
 
@@ -63,6 +65,7 @@ def save_index(
             file.write(json.dumps(chunk, ensure_ascii=False) + "\n")
 
     np.save(embeddings_path, embeddings)
+
 
 def main() -> None:
     settings = Settings()

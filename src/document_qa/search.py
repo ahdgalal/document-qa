@@ -19,15 +19,21 @@ class Index:
         self.embeddings = embeddings
         self.model = model
 
-    def search(self, question: str, top_k: int = 5, ) -> list[dict]:
-        
+    def search(
+        self,
+        question: str,
+        top_k: int = 5,
+    ) -> list[dict]:
+
         if top_k < 1:
             raise ValueError("top_k must be positive")
 
         if not self.chunks:
             return []
 
-        question_embedding = np.asarray(next(self.model.embed([question])), dtype=np.float32)
+        question_embedding = np.asarray(
+            next(self.model.embed([question])), dtype=np.float32
+        )
 
         scores = self.embeddings @ question_embedding
         top_indices = np.argsort(scores)[::-1][:top_k]
@@ -48,11 +54,7 @@ def load_index(data_dir: Path, model: TextEmbedding) -> Index:
     embeddings_path = data_dir / "embeddings.npy"
 
     with chunks_path.open(encoding="utf-8") as file:
-        chunks = [
-            json.loads(line)
-            for line in file
-            if line.strip()
-        ]
+        chunks = [json.loads(line) for line in file if line.strip()]
 
     embeddings = np.load(embeddings_path)
 
