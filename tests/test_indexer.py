@@ -2,6 +2,7 @@ import json
 
 import numpy as np
 
+from document_qa.document_parser import DocumentHasNoTextError
 from document_qa.indexer import collect_chunks, find_pdfs, save_index
 
 
@@ -62,7 +63,7 @@ def test_collect_chunks_skips_failed_document(tmp_path, monkeypatch, capsys):
 
     def fake_index_document(pdf_path):
         if pdf_path.name == "bad.pdf":
-            raise ValueError("No text found")
+            raise DocumentHasNoTextError("No text found")
         return [{"document_name": pdf_path.name, "text": "example"}]
 
     monkeypatch.setattr(
