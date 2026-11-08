@@ -25,7 +25,7 @@ SYSTEM_PROMPT = (
 
 
 class AskRequest(BaseModel):
-    question: str = Field(min_length=10)
+    question: str = Field(min_length=3)
 
 
 def generate_answer(messages: list[dict], settings: Settings) -> dict:
