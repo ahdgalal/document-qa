@@ -1,7 +1,7 @@
 [project]
 name = "document-qa"
 version = "0.1.0"
-description = "Add your description here"
+description = "A small RAG (retrieval-augmented generation) project. It finds the parts of your PDFs that match a question, then asks an LLM to answer using only those parts. If the documents don't contain the answer, it says `Answer not found.`"
 readme = "README.md"
 authors = [
     { name = "ahdgalal"}
@@ -18,8 +18,6 @@ dependencies = [
     "uvicorn>=0.54.0",
 ]
 
-[project.scripts]
-document-qa = "document_qa:main"
 
 [build-system]
 requires = ["uv_build>=0.12.17,<0.13.0"]
