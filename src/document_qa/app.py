@@ -39,6 +39,7 @@ def generate_answer(messages: list[dict], settings: Settings) -> dict:
         model=settings.llm_model,
         messages=messages,
         temperature=0,
+        max_tokens=500,
     )
 
     usage = response.usage
