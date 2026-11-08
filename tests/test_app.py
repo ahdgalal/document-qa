@@ -21,8 +21,8 @@ def create_test_app(monkeypatch, results):
     return create_app()
 
 
-def test_health_returns_ok():
-    app = create_app(Settings())
+def test_health_returns_ok(monkeypatch):
+    app = create_test_app(monkeypatch, [])
 
     with TestClient(app) as client:
         response = client.get("/health")
